@@ -1,0 +1,34 @@
+
+
+CREATE COMPUTE MODULE MF_firstdb_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		
+		--INSERT INTO Database.iib_test (brk_id,brk_name) VALUES (InputRoot.XMLNSC.iib_test.brk_id,InputRoot.XMLNSC.iib_test.brk_name);
+		 DELETE FROM Database.iib_test where iib_test.brk_id=InputRoot.XMLNSC.iib_test.brk_id;
+		 
+		 SET OutputRoot.XML.iib_test.Result[]=
+         (SELECT iib_test.brk_name FROM Database.iib_test);
+          
+		 
+		SET OutputRoot.XMLNSC.iib_test='sucess';
+		
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
